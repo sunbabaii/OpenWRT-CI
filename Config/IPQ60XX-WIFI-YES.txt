@@ -1,5 +1,45 @@
-#CMIOT GLINET QIHOO REDMI XIAOMI ZN JDCLOUD
 CONFIG_TARGET_qualcommax=y
 CONFIG_TARGET_qualcommax_ipq60xx=y
-#设备列表
-CONFIG_TARGET_DEVICE_qualcommax_ipq60xx_DEVICE_qihoo_360v6=y
+CONFIG_TARGET_qualcommax_ipq60xx_DEVICE_qihoo_360v6=y
+CONFIG_LIBCURL_COOKIES=y
+CONFIG_LIBCURL_CRYPTO_AUTH=y
+CONFIG_LIBCURL_FILE=y
+CONFIG_LIBCURL_FTP=y
+CONFIG_LIBCURL_HTTP=y
+CONFIG_LIBCURL_NGHTTP2=y
+CONFIG_LIBCURL_OPENSSL=y
+CONFIG_LIBCURL_PROXY=y
+CONFIG_LIBCURL_TFTP=y
+CONFIG_LIBCURL_THREADED_RESOLVER=y
+CONFIG_LIBCURL_TLS_SRP=y
+CONFIG_LIBCURL_UNIX_SOCKETS=y
+CONFIG_PACKAGE_adguardhome=y
+CONFIG_PACKAGE_curl=y
+CONFIG_PACKAGE_libcap-ng=y
+CONFIG_PACKAGE_libcurl=y
+CONFIG_PACKAGE_liblua=y
+CONFIG_PACKAGE_liblucihttp-lua=y
+CONFIG_PACKAGE_libnghttp2=y
+CONFIG_PACKAGE_libubus-lua=y
+CONFIG_PACKAGE_lua=y
+CONFIG_PACKAGE_luci-app-adguardhome=y
+CONFIG_PACKAGE_luci-app-cpufreq=y
+CONFIG_PACKAGE_luci-app-msd_lite=y
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Haproxy is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Client is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Shadowsocks_Rust_Server is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Simple_Obfs is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_SingBox is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Trojan_Plus is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_V2ray_Plugin is not set
+# CONFIG_PACKAGE_luci-app-passwall_INCLUDE_Xray is not set
+CONFIG_PACKAGE_luci-app-upnp=y
+CONFIG_PACKAGE_luci-lib-base=y
+CONFIG_PACKAGE_luci-lib-ip=y
+CONFIG_PACKAGE_luci-lib-jsonc=y
+CONFIG_PACKAGE_luci-lib-nixio=y
+CONFIG_PACKAGE_luci-lua-runtime=y
+CONFIG_PACKAGE_miniupnpd-nftables=y
+CONFIG_PACKAGE_msd_lite=y
+CONFIG_PACKAGE_opkg=y
+CONFIG_PACKAGE_ucode-mod-lua=y
