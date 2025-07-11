@@ -30,6 +30,7 @@ jobs:
     name: ${{matrix.TARGET}}
     strategy:
       fail-fast: false
+      SSH_ACTIONS: true
       #max-parallel: 3
       matrix:
         TARGET: [IPQ60XX-WIFI-YES, IPQ60XX-WIFI-NO, IPQ807X-WIFI-YES, IPQ807X-WIFI-NO]
