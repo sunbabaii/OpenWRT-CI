@@ -1,4 +1,7 @@
 #diy
+CONFIG_TCP_CONG_BBR=y
+CONFIG_DEFAULT_TCP_CONG="bbr"
+CONFIG_PACKAGE_kmod-tcp-bbr=y
 CONFIG_PACKAGE_nvme-cli=n
 CONFIG_PACKAGE_libnvme=n
 CONFIG_PACKAGE_kmod-nvme=n
