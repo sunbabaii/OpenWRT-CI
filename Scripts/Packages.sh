@@ -50,6 +50,7 @@ UPDATE_PACKAGE() {
 UPDATE_PACKAGE "argon" "sbwml/luci-theme-argon" "openwrt-25.12"
 UPDATE_PACKAGE "advancedplus" "sirpdboy/luci-app-advancedplus" "main"
 UPDATE_PACKAGE "easymesh" "torguardvpn/luci-app-easymesh" "main"
+UPDATE_PACKAGE "oaf" "destan19/OpenAppFilter" "master" "" "open-app-filter luci-app-appfilter"
 
 UPDATE_PACKAGE "turboacc" "mufeng05/turboacc" "main"
 UPDATE_PACKAGE "athena-led" "unraveloop/JDC-AX6600-Athena-LED-Controller" "main"
