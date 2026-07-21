@@ -55,6 +55,8 @@ UPDATE_PACKAGE "kucat-config" "sirpdboy/luci-app-kucat-config" "master"
 UPDATE_PACKAGE "noobwrt" "nooblk-98/luci-theme-noobwrt" "master"
 UPDATE_PACKAGE "shadcn" "eamonxg/luci-theme-shadcn" "main"
 UPDATE_PACKAGE "theme-fluent" "LazuliKao/luci-theme-fluent" "main"
+UPDATE_PACKAGE "advancedplus" "sirpdboy/luci-app-advancedplus" "main"
+UPDATE_PACKAGE "easymesh" "torguardvpn/luci-app-easymesh" "main"
 
 UPDATE_PACKAGE "turboacc" "mufeng05/turboacc" "main"
 UPDATE_PACKAGE "athena-led" "unraveloop/JDC-AX6600-Athena-LED-Controller" "main"
