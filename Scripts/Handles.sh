@@ -234,18 +234,18 @@ if [ -f "$RUST_FILE" ]; then
 fi
 
 # 添加 turboacc 补丁
-if [ -d "$PKG_PATH" ]; then
+WRT_ROOT="$GITHUB_WORKSPACE/wrt"   # 显式定义根目录
+if [ -d "$WRT_ROOT" ]; then
     echo " "
     echo "Applying turboacc patch..."
-    cd "$PKG_PATH" || {
-        echo "Failed to enter $PKG_PATH; skipping turboacc patch."
-        continue
+    # 进入根目录执行补丁
+    (cd "$WRT_ROOT" && \
+        curl -sSL https://raw.githubusercontent.com/mufeng05/turboacc/main/add_turboacc.sh -o add_turboacc.sh && \
+        bash add_turboacc.sh && \
+        rm -f add_turboacc.sh) || {
+        echo "turboacc patch failed!" >&2
+        # 如果希望编译终止，可加 exit 1；若继续则注释掉
+        # exit 1
     }
-    # 下载并执行补丁脚本
-    curl -sSL https://raw.githubusercontent.com/mufeng05/turboacc/main/add_turboacc.sh -o add_turboacc.sh && \
-        bash add_turboacc.sh
-    # 清理临时文件
-    rm -f add_turboacc.sh
-    cd - >/dev/null
     echo "turboacc patch applied!"
 fi
