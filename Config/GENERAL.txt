@@ -1,5 +1,4 @@
 #diy
-CONFIG_PACKAGE_luci-app-turboacc=y
 CONFIG_PACKAGE_block-mount=y
 CONFIG_PACKAGE_kmod-fs-vfat=y
 CONFIG_PACKAGE_kmod-fs-exfat=y
