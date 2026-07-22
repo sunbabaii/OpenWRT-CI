@@ -232,20 +232,3 @@ if [ -f "$RUST_FILE" ]; then
 		echo "rust fix failed; continuing!"
 	fi
 fi
-
-# 添加 turboacc 补丁
-WRT_ROOT="$GITHUB_WORKSPACE/wrt"   # 显式定义根目录
-if [ -d "$WRT_ROOT" ]; then
-    echo " "
-    echo "Applying turboacc patch..."
-    # 进入根目录执行补丁
-    (cd "$WRT_ROOT" && \
-        curl -sSL https://raw.githubusercontent.com/mufeng05/turboacc/main/add_turboacc.sh -o add_turboacc.sh && \
-        bash add_turboacc.sh && \
-        rm -f add_turboacc.sh) || {
-        echo "turboacc patch failed!" >&2
-        # 如果希望编译终止，可加 exit 1；若继续则注释掉
-        # exit 1
-    }
-    echo "turboacc patch applied!"
-fi
