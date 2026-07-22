@@ -52,7 +52,10 @@ UPDATE_PACKAGE "advancedplus" "sirpdboy/luci-app-advancedplus" "main"
 UPDATE_PACKAGE "easymesh" "torguardvpn/luci-app-easymesh" "main"
 UPDATE_PACKAGE "oaf" "destan19/OpenAppFilter" "master" "" "open-app-filter luci-app-appfilter"
 
-UPDATE_PACKAGE "istore" "linkease/istore" "main"
+UPDATE_PACKAGE "luci-app-store" "linkease/istore" "main" "pkg" "luci/luci-app-store"
+UPDATE_PACKAGE "luci-lib-taskd" "linkease/istore" "main" "pkg" "luci/luci-lib-taskd"
+UPDATE_PACKAGE "taskd" "linkease/istore" "main" "pkg" "taskd"
+UPDATE_PACKAGE "luci-lib-xterm"   "linkease/istore" "main" "pkg" "luci/luci-lib-xterm"
 UPDATE_PACKAGE "luci-lib-taskd" "linkease/luci-lib-taskd" "main"
 UPDATE_PACKAGE "taskd" "linkease/taskd" "main"
 UPDATE_PACKAGE "athena-led" "unraveloop/JDC-AX6600-Athena-LED-Controller" "main"
@@ -111,4 +114,25 @@ UPDATE_VERSION() {
 #引入私有扩展脚本
 if [ -f "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh" ]; then
 	source "$GITHUB_WORKSPACE/Scripts/PRIVATE.sh"
+fi
+
+# 手动处理 istore 相关包（含 luci-lib-xterm）
+ISTORE_REPO="https://github.com/linkease/istore.git"
+ISTORE_BRANCH="main"
+ISTORE_TMP="$GITHUB_WORKSPACE/istore_tmp"
+
+if [ -d "$PKG_PATH" ]; then
+    echo " "
+    echo "Cloning istore monorepo for all sub-packages..."
+    git clone --depth=1 --single-branch --branch $ISTORE_BRANCH "$ISTORE_REPO" "$ISTORE_TMP" || {
+        echo "Failed to clone istore repo"
+        exit 1
+    }
+    # 复制所需子目录到 package/
+    cp -rf "$ISTORE_TMP/luci/luci-app-store"   "$PKG_PATH/"
+    cp -rf "$ISTORE_TMP/luci/luci-lib-taskd"   "$PKG_PATH/"
+    cp -rf "$ISTORE_TMP/taskd"                 "$PKG_PATH/"
+    cp -rf "$ISTORE_TMP/luci/luci-lib-xterm"   "$PKG_PATH/"
+    rm -rf "$ISTORE_TMP"
+    echo "istore packages (including luci-lib-xterm) copied!"
 fi
