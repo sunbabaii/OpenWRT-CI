@@ -52,7 +52,7 @@ UPDATE_PACKAGE "advancedplus" "sirpdboy/luci-app-advancedplus" "main"
 UPDATE_PACKAGE "easymesh" "torguardvpn/luci-app-easymesh" "main"
 UPDATE_PACKAGE "oaf" "destan19/OpenAppFilter" "master" "" "open-app-filter luci-app-appfilter"
 
-UPDATE_PACKAGE "turboacc" "mufeng05/turboacc" "main"
+UPDATE_PACKAGE "istore" "linkease/istore" "main"
 UPDATE_PACKAGE "athena-led" "unraveloop/JDC-AX6600-Athena-LED-Controller" "main"
 UPDATE_PACKAGE "ddns-go" "sirpdboy/luci-app-ddns-go" "main"
 UPDATE_PACKAGE "diskman" "sbwml/luci-app-diskman" "main"
