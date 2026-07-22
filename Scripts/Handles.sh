@@ -232,3 +232,20 @@ if [ -f "$RUST_FILE" ]; then
 		echo "rust fix failed; continuing!"
 	fi
 fi
+
+# 添加 turboacc 补丁
+if [ -d "$PKG_PATH" ]; then
+    echo " "
+    echo "Applying turboacc patch..."
+    cd "$PKG_PATH" || {
+        echo "Failed to enter $PKG_PATH; skipping turboacc patch."
+        continue
+    }
+    # 下载并执行补丁脚本
+    curl -sSL https://raw.githubusercontent.com/mufeng05/turboacc/main/add_turboacc.sh -o add_turboacc.sh && \
+        bash add_turboacc.sh
+    # 清理临时文件
+    rm -f add_turboacc.sh
+    cd - >/dev/null
+    echo "turboacc patch applied!"
+fi
