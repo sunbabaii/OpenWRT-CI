@@ -233,38 +233,38 @@ if [ -f "$RUST_FILE" ]; then
 	fi
 fi
 
-echo "========== DOCKERMAN DEBUG =========="
+echo "===== Dockerman Debug ====="
 
-echo "PKG_PATH=$PKG_PATH"
+find "$GITHUB_WORKSPACE/wrt" \
+-name "luci-app-dockerman.json" \
+-print
 
-find "$PKG_PATH" -name "luci-app-dockerman.json"
+find "$GITHUB_WORKSPACE/wrt" \
+-name "events.js" \
+-path "*dockerman*" \
+-print
 
-find "$PKG_PATH" -name "events.js"
+echo "=========================="
 
-find "$PKG_PATH" -name "dockerman"
-
-echo "===================================="
-
-# ================== 强制删除 Dockerman Events（地毯式 + 调试） ==================
+# ================== 强制删除 Dockerman Events（直接路径） ==================
 echo " "
 echo "=== [FORCE] Removing Dockerman Events ==="
 
-# 查找所有 luci-app-dockerman.json
-DOCKERMAN_MENU_FILES=$(find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" 2>/dev/null)
+# 1. 直接查找可能的路径（相对路径从 wrt/package 出发）
+# 常见路径：feeds/luci/applications/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
+# 以及 package/feeds/luci/... 等
+MENU_FILES=$(find ../ -type f -name "luci-app-dockerman.json" 2>/dev/null)
 
-if [ -n "$DOCKERMAN_MENU_FILES" ]; then
-    echo "Found Dockerman menu files:"
-    echo "$DOCKERMAN_MENU_FILES"
-
-    for MENU_FILE in $DOCKERMAN_MENU_FILES; do
+if [ -n "$MENU_FILES" ]; then
+    echo "Found menu files:"
+    echo "$MENU_FILES"
+    for MENU_FILE in $MENU_FILES; do
         echo "Processing: $MENU_FILE"
-
         python3 - "$MENU_FILE" <<'EOF'
 import json, sys
 try:
     with open(sys.argv[1], 'r', encoding='utf-8') as f:
         data = json.load(f)
-
     keys_to_kill = [
         "admin/services/dockerman/events",
         "admin/services/dockerman/docker/events"
@@ -275,7 +275,6 @@ try:
             del data[k]
             print(f"    Removed key: {k}")
             changed = True
-
     if changed:
         with open(sys.argv[1], 'w', encoding='utf-8') as f:
             json.dump(data, f, indent="\t", ensure_ascii=False)
@@ -285,27 +284,26 @@ try:
 except Exception as e:
     print(f"    [ERROR] {e}")
 EOF
-
     done
 else
-    echo "No luci-app-dockerman.json found at all!"
-    # 列出 wrt 下所有 .json 文件，帮助调试
-    echo "Listing some .json files in wrt for debug:"
-    find "$GITHUB_WORKSPACE/wrt" -type f -name "*.json" 2>/dev/null | head -20
+    echo "No luci-app-dockerman.json found!"
+    # 额外调试：列出 ../feeds/luci/applications/ 内容
+    echo "Contents of ../feeds/luci/applications/ (if exists):"
+    ls -la ../feeds/luci/applications/ 2>/dev/null || echo "Directory not found"
 fi
 
-# 删除所有 events.js
+# 2. 删除所有 events.js
 echo " "
 echo "Deleting all events.js files..."
-find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" 2>/dev/null | while read -r JS_FILE; do
+find ../ -type f -name "events.js" 2>/dev/null | while read -r JS_FILE; do
     if echo "$JS_FILE" | grep -q "dockerman"; then
         echo "  Deleting: $JS_FILE"
         rm -f "$JS_FILE"
     fi
 done
 
-# 清理 build_dir 缓存（确保修改后的源码被重新打包）
-BUILD_DIR="$GITHUB_WORKSPACE/wrt/build_dir"
+# 3. 清理 build_dir 缓存
+BUILD_DIR="../build_dir"
 if [ -d "$BUILD_DIR" ]; then
     echo " "
     echo "Cleaning build_dir cache for dockerman..."
