@@ -136,9 +136,42 @@ if [ -d "$PKG_PATH" ]; then
     echo "istore packages (including luci-lib-xterm) copied!"
 fi
 
-# remove dockerman events page
+# ================== 裁剪 Dockerman Events 页面 ==================
+DOCKERMAN_MENU="$(find "$PKG_PATH" \
+    -path '*luci-app-dockerman*/root/usr/share/luci/menu.d/luci-app-dockerman.json' \
+    -print -quit)"
 
-rm -f package/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/events.js
+if [ -f "$DOCKERMAN_MENU" ]; then
+    echo " "
+    echo "Removing Dockerman Events menu entry..."
 
-sed -i '/admin\/services\/dockerman\/events/,/^    }/d' \
-package/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
+    python3 - "$DOCKERMAN_MENU" <<'EOF'
+import json, sys
+try:
+    with open(sys.argv[1], 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    key = "admin/services/dockerman/events"
+    if key in data:
+        del data[key]
+        with open(sys.argv[1], 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent="\t", ensure_ascii=False)
+        print("Events menu removed")
+    else:
+        print("Events menu not found")
+except Exception as e:
+    print("JSON error:", e, file=sys.stderr)
+    sys.exit(1)
+EOF
+
+    if [ $? -eq 0 ]; then
+        echo "Dockerman menu processing finished."
+        # 仅在菜单处理成功时删除前端资源
+        find "$PKG_PATH" -path '*luci-app-dockerman*' -name 'events.js' -delete
+        echo "Dockerman events.js removed (if existed)."
+    else
+        echo "Dockerman menu processing failed! Skipping events.js deletion." >&2
+    fi
+else
+    echo "Dockerman menu file not found, skipping."
+fi
+# ============================================================
