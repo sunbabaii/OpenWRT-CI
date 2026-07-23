@@ -232,3 +232,63 @@ if [ -f "$RUST_FILE" ]; then
 		echo "rust fix failed; continuing!"
 	fi
 fi
+
+# ================== 强制裁剪 Dockerman Events 页面 ==================
+echo " "
+echo "=== Removing Dockerman Events entries (enhanced) ==="
+
+# 1. 在 wrt 目录下查找所有 luci-app-dockerman.json（menu.d 目录下的）
+DOCKERMAN_MENU_FILES=$(find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" -path "*/menu.d/*" 2>/dev/null)
+
+if [ -n "$DOCKERMAN_MENU_FILES" ]; then
+    echo "Found Dockerman menu files:"
+    echo "$DOCKERMAN_MENU_FILES"
+
+    for MENU_FILE in $DOCKERMAN_MENU_FILES; do
+        echo "Processing: $MENU_FILE"
+
+        python3 - "$MENU_FILE" <<'EOF'
+import json, sys
+try:
+    with open(sys.argv[1], 'r', encoding='utf-8') as f:
+        data = json.load(f)
+    
+    # 要删除的两个 events 入口
+    keys_to_remove = [
+        "admin/services/dockerman/events",
+        "admin/services/dockerman/docker/events"
+    ]
+    
+    changed = False
+    for key in keys_to_remove:
+        if key in data:
+            del data[key]
+            print(f"  -> Removed: {key}")
+            changed = True
+        else:
+            print(f"  -> Key not found: {key}")
+    
+    if changed:
+        with open(sys.argv[1], 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent="\t", ensure_ascii=False)
+        print("  -> File updated.")
+    else:
+        print("  -> No changes made.")
+except Exception as e:
+    print(f"  -> ERROR: {e}", file=sys.stderr)
+EOF
+    done
+else
+    echo "No luci-app-dockerman.json found in menu.d paths!"
+    echo "Searching entire wrt directory for any luci-app-dockerman.json:"
+    find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" 2>/dev/null
+fi
+
+# 2. 删除所有 events.js 文件
+echo " "
+echo "Deleting all events.js files under dockerman paths..."
+find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" -path "*/dockerman/*" -delete -print 2>/dev/null || \
+find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" -delete -print 2>/dev/null
+
+echo "=== Dockerman Events removal completed ==="
+# ============================================================
