@@ -233,12 +233,24 @@ if [ -f "$RUST_FILE" ]; then
 	fi
 fi
 
-# ================== 强制裁剪 Dockerman Events 页面 ==================
-echo " "
-echo "=== Removing Dockerman Events entries (enhanced) ==="
+echo "========== DOCKERMAN DEBUG =========="
 
-# 1. 在 wrt 目录下查找所有 luci-app-dockerman.json（menu.d 目录下的）
-DOCKERMAN_MENU_FILES=$(find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" -path "*/menu.d/*" 2>/dev/null)
+echo "PKG_PATH=$PKG_PATH"
+
+find "$PKG_PATH" -name "luci-app-dockerman.json"
+
+find "$PKG_PATH" -name "events.js"
+
+find "$PKG_PATH" -name "dockerman"
+
+echo "===================================="
+
+# ================== 强制删除 Dockerman Events（地毯式 + 调试） ==================
+echo " "
+echo "=== [FORCE] Removing Dockerman Events ==="
+
+# 查找所有 luci-app-dockerman.json
+DOCKERMAN_MENU_FILES=$(find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" 2>/dev/null)
 
 if [ -n "$DOCKERMAN_MENU_FILES" ]; then
     echo "Found Dockerman menu files:"
@@ -252,43 +264,56 @@ import json, sys
 try:
     with open(sys.argv[1], 'r', encoding='utf-8') as f:
         data = json.load(f)
-    
-    # 要删除的两个 events 入口
-    keys_to_remove = [
+
+    keys_to_kill = [
         "admin/services/dockerman/events",
         "admin/services/dockerman/docker/events"
     ]
-    
     changed = False
-    for key in keys_to_remove:
-        if key in data:
-            del data[key]
-            print(f"  -> Removed: {key}")
+    for k in keys_to_kill:
+        if k in data:
+            del data[k]
+            print(f"    Removed key: {k}")
             changed = True
-        else:
-            print(f"  -> Key not found: {key}")
-    
+
     if changed:
         with open(sys.argv[1], 'w', encoding='utf-8') as f:
             json.dump(data, f, indent="\t", ensure_ascii=False)
-        print("  -> File updated.")
+        print("    [OK] File updated.")
     else:
-        print("  -> No changes made.")
+        print("    [SKIP] No target keys found.")
 except Exception as e:
-    print(f"  -> ERROR: {e}", file=sys.stderr)
+    print(f"    [ERROR] {e}")
 EOF
+
     done
 else
-    echo "No luci-app-dockerman.json found in menu.d paths!"
-    echo "Searching entire wrt directory for any luci-app-dockerman.json:"
-    find "$GITHUB_WORKSPACE/wrt" -type f -name "luci-app-dockerman.json" 2>/dev/null
+    echo "No luci-app-dockerman.json found at all!"
+    # 列出 wrt 下所有 .json 文件，帮助调试
+    echo "Listing some .json files in wrt for debug:"
+    find "$GITHUB_WORKSPACE/wrt" -type f -name "*.json" 2>/dev/null | head -20
 fi
 
-# 2. 删除所有 events.js 文件
+# 删除所有 events.js
 echo " "
-echo "Deleting all events.js files under dockerman paths..."
-find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" -path "*/dockerman/*" -delete -print 2>/dev/null || \
-find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" -delete -print 2>/dev/null
+echo "Deleting all events.js files..."
+find "$GITHUB_WORKSPACE/wrt" -type f -name "events.js" 2>/dev/null | while read -r JS_FILE; do
+    if echo "$JS_FILE" | grep -q "dockerman"; then
+        echo "  Deleting: $JS_FILE"
+        rm -f "$JS_FILE"
+    fi
+done
 
-echo "=== Dockerman Events removal completed ==="
+# 清理 build_dir 缓存（确保修改后的源码被重新打包）
+BUILD_DIR="$GITHUB_WORKSPACE/wrt/build_dir"
+if [ -d "$BUILD_DIR" ]; then
+    echo " "
+    echo "Cleaning build_dir cache for dockerman..."
+    find "$BUILD_DIR" -type d -name "*luci-app-dockerman*" -exec rm -rf {} + 2>/dev/null || true
+    find "$BUILD_DIR" -type f -name "luci-app-dockerman.json" -delete 2>/dev/null || true
+    find "$BUILD_DIR" -type f -name "events.js" -delete 2>/dev/null || true
+    echo "build_dir cache cleaned."
+fi
+
+echo "=== [FORCE] Dockerman Events removal completed ==="
 # ============================================================
