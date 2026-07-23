@@ -135,3 +135,10 @@ if [ -d "$PKG_PATH" ]; then
     rm -rf "$ISTORE_TMP"
     echo "istore packages (including luci-lib-xterm) copied!"
 fi
+
+# remove dockerman events page
+
+rm -f package/luci-app-dockerman/htdocs/luci-static/resources/view/dockerman/events.js
+
+sed -i '/admin\/services\/dockerman\/events/,/^    }/d' \
+package/luci-app-dockerman/root/usr/share/luci/menu.d/luci-app-dockerman.json
